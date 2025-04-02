@@ -59,7 +59,6 @@ README.md
 - **N_pendulum.py**: Python script generalizing to an N-link pendulum system.
 - **animation/**: Contains recorded or exported videos (`double_pendulum.mp4`, `N_pendulum.mp4`).
 - **tex/**: Contains the LaTeX source (`report.tex`) and compiled PDF for the homework report.
-- **requirements.txt**: Python dependencies (if you are including this file).
 - **README.md**: Project instructions and documentation.
 
 ## Installation and Setup
@@ -69,29 +68,6 @@ README.md
 - **Python 3.7+** (tested on Python 3.10)
 - **pip** (or any alternative Python package manager)
 - A functioning **OpenGL**-capable environment is recommended since VPython uses 3D rendering.
-
-### Step-by-Step Setup
-
-1. **Clone the Repository** (or download as ZIP):
-   ```bash
-   git clone https://github.com/ChestnutKurisu/double-pendulum.git
-   cd double-pendulum
-   ```
-
-2. **Create a Virtual Environment** (recommended):
-
-   Using `venv`:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate   # (Linux/macOS)
-   .venv\Scripts\activate      # (Windows)
-   ```
-
-3. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   *Note: The key libraries are `vpython` and `numpy`. Make sure these install successfully.*
 
 ## Execution Instructions
 
