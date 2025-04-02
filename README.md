@@ -16,7 +16,6 @@ Both serve as demonstrations of chaotic motion, visualized in real-time with a c
 - [Simulation Parameters](#simulation-parameters)
 - [References and Resources](#references-and-resources)
 - [Contact](#contact)
-- [License](#license)
 
 ## Overview
 
