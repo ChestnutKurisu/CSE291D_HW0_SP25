@@ -91,7 +91,7 @@
 
 \noindent
 \textbf{Instructor:} Albert Chern \\
-\textbf{Homework \homeworknum: A Chaotic Double Pendulum Simulation in Python and VPython}\\
+\textbf{Homework \homeworknum: A Chaotic Double Pendulum Simulation and Generalized N-Pendulum in Python and VPython}\\
 \rule{\textwidth}{0.4pt}
 
 \begin{enumerate}[leftmargin=*, itemsep=1em]
@@ -99,25 +99,34 @@
 % ----------------------------------------------------------------------------------
 \item \textbf{Overview and Motivation}
 
-This document presents a double pendulum simulation implemented in Python with VPython for 3D visualization. We outline the physical equations of motion, the numerical methods used (fourth-order Runge–Kutta), and the code structure. A pastel color palette is introduced for an aesthetically pleasing visualization. The results demonstrate chaotic behavior characteristic of a double pendulum, and the system serves as a visual tool for educational and research purposes in advanced dynamics.
+This document presents two pendulum simulation scripts implemented in Python with VPython for 3D visualization:
+
+\begin{enumerate}
+    \item A classic \emph{double pendulum} simulation (\texttt{double\_pendulum.py}).
+    \item A generalized \emph{N-pendulum} simulation (\texttt{N\_pendulum.py}).
+\end{enumerate}
+
+We outline the physical equations of motion, the numerical methods used (fourth-order Runge–Kutta), and the code structure. A pastel color palette is introduced for an aesthetically pleasing visualization. The results demonstrate chaotic behavior characteristic of multi-link pendulums, and the system serves as a visual tool for educational and research purposes in advanced dynamics.
 
 % ----------------------------------------------------------------------------------
 \item \textbf{Introduction}
 
-The double pendulum is a well-known physical system that exhibits chaotic behavior for certain initial conditions. It consists of two rods and two masses, with the second mass hanging from the first. Despite its deceptively simple construction, the double pendulum can display highly sensitive dependence on initial conditions, making it a quintessential example of chaos in classical mechanics.
+\textbf{Double Pendulum.} The double pendulum is a well-known physical system that exhibits chaotic behavior for certain initial conditions. It consists of two rods and two masses, with the second mass hanging from the first. Despite its deceptively simple construction, the double pendulum can display highly sensitive dependence on initial conditions, making it a quintessential example of chaos in classical mechanics.
 
-The primary objectives of this simulation are:
+\textbf{N-Pendulum.} More generally, one can consider a chain of $N$ masses and $N$ rods (or $N$ segments) pivoting freely in a plane. Formulating the equations of motion for $N$ bobs is significantly more involved than for the single or double pendulum. In recent work, \textit{Yesilyurt}~\cite{yesilyurt2020equationsmotionformulationpendulum} presents a derivation of these equations using both Lagrange mechanics (with an inductive approach) and a direct vector method. This approach yields a concise summation form for the $N$-pendulum’s equations of motion, which we implement in \texttt{N\_pendulum.py} using a matrix-based solver at each time step.
+
+The primary objectives of these simulations are:
 \begin{itemize}
-    \item To demonstrate chaotic motion via real-time 3D rendering.
-    \item To provide a straightforward Python program that can be easily modified for educational or experimental purposes.
-    \item To showcase a pastel color scheme that softens the visual appearance of the standard double pendulum demonstration.
+    \item To demonstrate chaotic motion via real-time 3D rendering for both double and $N$-pendulum cases.
+    \item To provide straightforward Python programs that can be easily modified for educational or experimental purposes.
+    \item To showcase a pastel color scheme that softens the visual appearance of pendulum demonstrations.
 \end{itemize}
 
 % ----------------------------------------------------------------------------------
-\item \textbf{Equations of Motion}
+\item \textbf{Equations of Motion for the Double Pendulum}
 \label{sec:equations}
 
-Denote:
+Denote for the double pendulum:
 \begin{itemize}
     \item $\theta_1(t)$: Angle of the first (upper) pendulum from the vertical.
     \item $\theta_2(t)$: Angle of the second (lower) pendulum from the vertical.
@@ -149,7 +158,29 @@ Figure~\ref{fig:double-pendulum-eqns} below.
 \end{figure*}
 
 % ----------------------------------------------------------------------------------
-\item \textbf{Numerical Integration}
+\item \textbf{Equations of Motion for the N-Pendulum}
+
+The $N$-pendulum extends the system to $N$ bobs and rods. Following \textit{Yesilyurt}~\cite{yesilyurt2020equationsmotionformulationpendulum}, one obtains a coupled set of $N$ equations:
+\[
+\sum_{k=1}^{N}
+\left(
+g\,l_j\,\sin(\theta_j)\,m_k \,\sigma_{j,k}
+\;+\;m_k \,l_j^2\,\ddot{\theta_j}\,\sigma_{j,k}
+\;+\;\left(\!\!\sum_{q\ge k}^{N} m_q \,\sigma_{j,q}\right)\,l_j\,l_k\,
+\sin(\theta_j-\theta_k)\,\dot{\theta_j}\,\dot{\theta_k}
+\;+\;\ldots
+\right)
+\;=\;0,
+\]
+where $\theta_j$ is the angle of the $j$-th bob from the vertical, $m_j$ and $l_j$ are the mass and rod length of the $j$-th pendulum link, $g$ is gravitational acceleration, and the indicator functions $\sigma_{j,k}$ and $\phi_{j,k}$ appear to handle the sums in a systematic way. In our code, we translate these summations into a matrix--vector system:
+\[
+\mathbf{M}(\boldsymbol{\theta},\dot{\boldsymbol{\theta}})\;\ddot{\boldsymbol{\theta}}
+\;=\;-\,\mathbf{f}(\boldsymbol{\theta},\dot{\boldsymbol{\theta}}),
+\]
+and solve for $\ddot{\boldsymbol{\theta}}$ at each time step (see \texttt{N\_pendulum.py}).
+
+% ----------------------------------------------------------------------------------
+\item \textbf{Numerical Integration: Fourth-Order Runge–Kutta}
 
 We employ the fourth-order Runge–Kutta (RK4) method to integrate the system in small time steps $\Delta t$:
 \[
@@ -161,17 +192,17 @@ We employ the fourth-order Runge–Kutta (RK4) method to integrate the system in
 \mathbf{y}_{n+1} &= \mathbf{y}_n + \frac{\Delta t}{6}(\mathbf{k}_1 + 2\mathbf{k}_2 + 2\mathbf{k}_3 + \mathbf{k}_4),
 \end{aligned}
 \]
-where $\mathbf{y} = [\theta_1, \omega_1, \theta_2, \omega_2]$ and $\mathbf{f}$ encapsulates the equations of motion in Section~\ref{sec:equations}.
+where for the double pendulum $\mathbf{y} = [\theta_1, \omega_1, \theta_2, \omega_2]$, and for the $N$-pendulum, $\mathbf{y} = [\theta_0,\dots,\theta_{N-1},\,\omega_0,\dots,\omega_{N-1}]$. The function $\mathbf{f}$ encapsulates the appropriate equations of motion.
 
 % ----------------------------------------------------------------------------------
 \item \textbf{Implementation in Python and VPython}
 \label{sec:implementation}
 
-\textbf{Code Listing:} Below is the core script,
+\textbf{Code Listing for Double Pendulum:} Below is the core script,
 \texttt{double\_pendulum.py},
 which implements the double pendulum with a custom pastel palette.
 
-\begin{lstlisting}[language=Python, caption=Double Pendulum Simulation with Pastel Palette, label=lst:doublependulum]
+\begin{lstlisting}[language=Python, caption=Double Pendulum Simulation (double\_pendulum.py), label=lst:doublependulum]
 #!/usr/bin/env python3
 import math
 import numpy as np
@@ -189,14 +220,14 @@ def hex_to_rgbnorm(hex_str):
     return vector(r, g, b)
 
 # Pastel color palette
-BACKGROUND_PASTEL_HEX = '#FFF0F5'   # Lavender blush for a light background
-PIVOT_COLOR_HEX       = '#EE82EE'   # Violet
-ROD1_COLOR_HEX        = '#8F8788'   # Pastel pink
-ROD2_COLOR_HEX        = '#8F8788'   # Pastel pink
-MASS1_COLOR_HEX       = '#9370DB'   # Medium purple
-MASS2_COLOR_HEX       = '#DA70D6'   # Orchid
-MASS2_TRAIL_COLOR_HEX = '#DA70D6'   # Light orchid
-FLOOR_COLOR_HEX       = '#D3D3D3'   # Light gray for the floor
+BACKGROUND_PASTEL_HEX = '#FFF0F5'
+PIVOT_COLOR_HEX       = '#EE82EE'
+ROD1_COLOR_HEX        = '#8F8788'
+ROD2_COLOR_HEX        = '#8F8788'
+MASS1_COLOR_HEX       = '#9370DB'
+MASS2_COLOR_HEX       = '#DA70D6'
+MASS2_TRAIL_COLOR_HEX = '#DA70D6'
+FLOOR_COLOR_HEX       = '#D3D3D3'
 
 def double_pendulum_derivs(y, params):
     """Derivatives of the planar double pendulum."""
@@ -371,28 +402,57 @@ if __name__ == "__main__":
 \end{enumerate}
 
 % ----------------------------------------------------------------------------------
+\item \textbf{N-Pendulum Implementation (Generalized)}
+\label{sec:NPendulumImplementation}
+
+We also provide a script for simulating an $N$-link pendulum in \texttt{N\_pendulum.py}, which builds the mass matrix $\mathbf{M}$ and the forcing vector $\mathbf{f}$ by directly translating the summation-based formulas (e.g., Equation~(86) in \cite{yesilyurt2020equationsmotionformulationpendulum}). An $N\times N$ linear system is solved at each time step to find the angular accelerations. The code follows an RK4 approach, similarly to the double pendulum script.
+
+Below is a brief excerpt showing the main matrix/forcing construction (for reference only):
+
+\begin{lstlisting}[language=Python, caption=Excerpt from N\_pendulum.py (Matrix Construction)]
+def build_M_and_f(angles, omegas, lengths, masses, g):
+    N = len(angles)
+    Mmat = np.zeros((N, N), dtype=float)
+    fvec = np.zeros(N, dtype=float)
+    ...
+    # Summation-based approach (Equation 86 in Yesilyurt reference)
+    # Mmat[j,j], Mmat[j,k], and fvec[j] get contributions from:
+    #  g * l_j * sin(theta_j)* m_k, velocity coupling, etc.
+    ...
+    return (Mmat, fvec)
+\end{lstlisting}
+
+Because each time step requires $\mathcal{O}(N^3)$ operations (due to matrix inversion or solving), the simulation may slow down for larger $N$. Nonetheless, it effectively illustrates the complexity and chaotic behavior of higher-order pendulum systems.
+
+% ----------------------------------------------------------------------------------
 \item \textbf{Usage and Customization}
 \label{sec:usage}
 
-\textbf{Running the Code:} To run this simulation:
+\textbf{Running the Double Pendulum:}
 \begin{verbatim}
 python double_pendulum.py
 \end{verbatim}
 A new browser window will open, displaying the real-time 3D animation of the double pendulum.
 
-\textbf{Changing Parameters:} Key parameters include masses ($m_1$, $m_2$), rod lengths ($L_1$, $L_2$), gravitational acceleration ($g$), and initial angles ($\theta_1$, $\theta_2$). These can be modified directly in \texttt{run\_simulation()} to explore different dynamical regimes.
+\textbf{Running the N-Pendulum:}
+\begin{verbatim}
+python N_pendulum.py
+\end{verbatim}
+Here, you can modify \texttt{N} (the number of pendulum links) as well as the arrays for rod lengths and masses, and choose different initial angles in the \texttt{run\_simulation()} function.
 
-\textbf{Capturing Frames:} If you wish to create a video, set \texttt{CAPTURE\_FRAMES = True}. This will save each frame as \texttt{frame0000.png}, \texttt{frame0001.png}, etc. You can then convert them into a video (e.g., using \texttt{ffmpeg}).
+\textbf{Changing Parameters:} For both scripts, key parameters include masses, rod lengths, gravitational acceleration, and initial angles. These can be modified directly in \texttt{run\_simulation()} to explore different dynamical regimes.
+
+\textbf{Capturing Frames:} If you wish to create a video of either simulation, enable the respective capture flags (e.g., \texttt{CAPTURE\_FRAMES}) if present or incorporate \texttt{scene.capture(...)} within the main loop.
 
 % ----------------------------------------------------------------------------------
 \item \textbf{Results and Observations}
 
-The double pendulum exhibits extreme sensitivity to initial conditions. Small changes in angles, rod lengths, or masses can result in dramatically different trajectories. Over longer simulation times, the path of the second mass often fills a significant portion of the accessible phase space, illustrating chaotic behavior.
+Both the double pendulum and the $N$-pendulum exhibit extreme sensitivity to initial conditions. Small changes in angles, rod lengths, or masses can result in dramatically different trajectories. Over longer simulation times, the paths of the various bobs often fill significant portions of the accessible phase space, illustrating chaotic behavior.
 
 % ----------------------------------------------------------------------------------
 \item \textbf{Conclusion}
 
-We presented a Python-based double pendulum simulation with a focus on readability, extensibility, and visual appeal. Students and researchers in classical mechanics or chaos theory can modify the code to investigate various phenomena, such as energy transfer, Lyapunov exponents, or synchronization in coupled pendulums.
+We presented Python-based simulations of double and $N$-link pendulums with a focus on readability, extensibility, and visual appeal. Students and researchers in classical mechanics or chaos theory can modify the code to investigate various phenomena, such as energy transfer, Lyapunov exponents, or the continuum limit as $N\to\infty$.
 
 % ----------------------------------------------------------------------------------
 % \item \textbf{References}
@@ -408,6 +468,9 @@ Strogatz, S. (2018). \textit{Nonlinear Dynamics and Chaos with Applications to P
 
 \bibitem{vpython}
 Sherwood, B. and others. (2025). \textit{VPython Library: Real-time 3D Graphics for Python}. \url{https://vpython.org}
+
+\bibitem{yesilyurt2020equationsmotionformulationpendulum}
+Yesilyurt, B. (2020). \textit{Equations of Motion Formulation of a Pendulum Containing N-point Masses}. arXiv e-prints. \url{https://arxiv.org/abs/1910.12610}
 
 \end{thebibliography}
 
