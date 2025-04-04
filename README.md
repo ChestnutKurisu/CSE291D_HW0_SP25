@@ -20,8 +20,19 @@ Both serve as demonstrations of chaotic motion, visualized in real-time with a c
 ## Overview
 
 A pendulum with multiple links (masses) is a classic example of a physical system that can exhibit highly complex and chaotic behavior. This project implements:
-1. A **double pendulum** with explicit equations of motion.  
+1. A **double pendulum** with explicit equations of motion.
+
+   <video width="640" controls>
+     <source src="animation/double_pendulum.mp4" type="video/mp4">
+     Your browser does not support the video tag.
+   </video>
+
 2. An **N-pendulum** that constructs the mass matrix and forcing terms from summation-based formulas (following [Yesilyurt 2020][yesilyurt2020]) for an arbitrary number of rods and masses.
+
+   <video width="640" controls>
+     <source src="animation/N_pendulum.mp4" type="video/mp4">
+     Your browser does not support the video tag.
+   </video>
 
 **Numerical Integration:** Both scripts use a 4th-order Runge–Kutta (RK4) method to solve the coupled ordinary differential equations (ODEs) of motion.
 
